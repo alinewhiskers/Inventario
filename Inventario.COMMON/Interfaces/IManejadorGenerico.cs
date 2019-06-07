@@ -5,11 +5,13 @@ using System.Text;
 
 namespace Inventario.COMMON.Interfaces
 {
-    public interface IRepositorio <T> where T: Base
+    public interface IManejadorGenerico<T> where T:Base
     {
-        bool Crear(T entidad);
-        bool Editar(T entidadModificada);
+        bool Agregar(T entidad);
+        List<T> Listar { get; }
         bool Eliminar(string id);
-        List<T> Leer { get; }
+        bool Modificar(T entidad);
+        T BuscarPorId(string id);
+
     }
 }
