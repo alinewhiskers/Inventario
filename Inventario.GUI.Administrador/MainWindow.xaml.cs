@@ -4,19 +4,8 @@ using Inventario.COMMON.Interfaces;
 using Inventario.DAL;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 using MessageBox = System.Windows.MessageBox;
 
 namespace Inventario.GUI.Administrador
@@ -31,20 +20,27 @@ namespace Inventario.GUI.Administrador
             Nuevo,
             Editar
         }
-        IManejadorArticulos manejadorArticulos;
 
+        private const double IVA = 1.16;
+        IManejadorArticulos manejadorArticulos;
+        List<Articulo> carrito = new List<Articulo>();
         accion accionArticulos;
 
         public MainWindow()
         {
             InitializeComponent();
-
+            inicial();
             manejadorArticulos = new ManejadorArticulos(new RepositorioDeArticulos());
-
             PonerBotonesArticulosEnEdicion(false);
             LimpiarCamposDeArticulos();
             ActualizarTablaArticulos();
             LlenarComboTipo();
+        }
+
+        private void inicial()
+        {
+            btnArticulosComprar.IsEnabled = false;
+            btnArticulosVaciar.IsEnabled = false;
         }
 
         private void LlenarComboTipo()
@@ -70,7 +66,8 @@ namespace Inventario.GUI.Administrador
             txbPedido.Clear();
             txbPrecioUnitario.Clear();
             txbArticulosUnidad.Clear();
-            cbArticulosTamanio.Text="";
+            cbArticulosTamanio.Text = "";
+            txbPrecioTotal.Text = "";
         }
 
         private void PonerBotonesArticulosEnEdicion(bool v)
@@ -125,6 +122,11 @@ namespace Inventario.GUI.Administrador
 
         private void BtnArticulosGuardar_Click(object sender, RoutedEventArgs e)
         {
+            guardarArticulo();
+        }
+
+        private void guardarArticulo()
+        {
             if (accionArticulos == accion.Nuevo)
             {
                 try
@@ -150,32 +152,37 @@ namespace Inventario.GUI.Administrador
                     {
                         MessageBox.Show("El Articulo no se pudo agregar", "Inventarios", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                } catch (FormatException)
+                }
+                catch (FormatException)
                 {
                     MessageBox.Show("El Articulo no se pudo agregar, uno de los datos no es correcto", "Inventarios", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                
+
             }
             else
             {
-                Articulo art = dtgArticulos.SelectedItem as Articulo;
-                art.Descripcion = txbArticulosDescripcion.Text;
-                art.Tipo = txbArticulosTipo.Text;
-                art.Pedido = txbPedido.Text;
-                art.Precio = Convert.ToDouble(txbPrecioUnitario.Text);
-                art.Unidad = txbArticulosUnidad.Text;
-                art.Tamanio = cbArticulosTamanio.SelectedItem.ToString();
-                if (manejadorArticulos.Modificar(art))
+                try
                 {
-                    MessageBox.Show("Articulo modificado correctamente", "Inventarios", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LimpiarCamposDeArticulos();
-                    ActualizarTablaArticulos();
-                    PonerBotonesArticulosEnEdicion(false);
-                }
-                else
-                {
-                    MessageBox.Show("El Articulo no se pudo modificar", "Inventarios", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                    Articulo art = dtgArticulos.SelectedItem as Articulo;
+                    art.Descripcion = txbArticulosDescripcion.Text;
+                    art.Tipo = txbArticulosTipo.Text;
+                    art.Pedido = txbPedido.Text;
+                    art.Precio = Convert.ToDouble(txbPrecioUnitario.Text);
+                    art.Unidad = txbArticulosUnidad.Text;
+                    art.Tamanio = cbArticulosTamanio.SelectedItem.ToString();
+                    if (manejadorArticulos.Modificar(art))
+                    {
+                        MessageBox.Show("Articulo modificado correctamente", "Inventarios", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LimpiarCamposDeArticulos();
+                        ActualizarTablaArticulos();
+                        PonerBotonesArticulosEnEdicion(false);
+                    }
+                    else
+                    {
+                        MessageBox.Show("El Articulo no se pudo modificar", "Inventarios", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                } catch (NullReferenceException e){ Console.WriteLine(e.Message); }
+                
             }
         }
 
@@ -191,10 +198,105 @@ namespace Inventario.GUI.Administrador
                 txbArticulosUnidad.Text = art.Unidad;
                 cbArticulosTamanio.SelectedValue = art.Tamanio;
                 txbPrecioUnitario.Text = art.Precio.ToString();
+                txbPrecioTotal.Text = art.PrecioTotal.ToString("C");
                 accionArticulos = accion.Editar;
                 PonerBotonesArticulosEnEdicion(true);
             }
 
         }
+
+        private void CalculaPrecio(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            string llave =e.Key.ToString();
+            if (llave.Equals("Return"))
+            {
+                guardarArticulo();
+            }
+            else
+            {
+                try
+                {
+                    txbPrecioTotal.Text = (Convert.ToDouble(txbPrecioUnitario.Text) * IVA).ToString("C");
+                }
+                catch (Exception)
+                {
+                    txbPrecioTotal.Text = "No se puede calcular";
+                }
+            }
+            
+        }
+
+        private void BotonCarrito(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (dtgArticulos.SelectedItem != null)
+            {
+                btnArticulosComprar.IsEnabled = true;
+            }
+            else
+            {
+                btnArticulosComprar.IsEnabled = false;
+            }
+            if (carrito.Count == 0)
+            {
+                btnArticulosVaciar.IsEnabled = false;
+            }
+            else
+            {
+                btnArticulosVaciar.IsEnabled = true;
+            }
+        }
+
+        private void BtnArticulosComprar_Click(object sender, RoutedEventArgs e)
+        {
+            double total = 0;
+            string texto;
+            Articulo art = dtgArticulos.SelectedItem as Articulo;
+
+            if (art != null)
+            {
+                string id_art = art.Id;
+                string descripcion_art = art.Descripcion;
+                string tipo_art = art.Tipo;
+                string pedido_art = art.Pedido;
+                string unidad_art = art.Unidad;
+                string tamanio_art = art.Tamanio;
+                double precio_art = art.Precio;
+                double precioTotal_art = art.PrecioTotal;
+            }
+            carrito.Insert(carrito.Count, art);
+            if (carrito.Count == 1)
+            {
+                texto = " producto ";
+            }
+            else
+            {
+                texto = " productos ";
+            }
+            foreach (var dato in carrito)
+            {
+                total += dato.PrecioTotal;
+            }
+            MessageBox.Show("¡El artículo se agregó a la lista!\n\nSe agregó " + carrito.Count + texto + "con total de: " + total.ToString("C"), "Carrito Actualizado", MessageBoxButton.OK, MessageBoxImage.Information);
+
+
+        }
+
+        private void BtnArticulosVaciar_Click(object sender, RoutedEventArgs e)
+        {
+            string texto;
+            if (carrito.Count == 1)
+            {
+                texto = " producto ";
+            }
+            else
+            {
+                texto = " productos ";
+            }
+            carrito.RemoveRange(0, carrito.Count);
+            MessageBox.Show(carrito.Count + texto + " se quitaron del carrito", "Carrito Actualizado", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+        }
+
+
     }
 }

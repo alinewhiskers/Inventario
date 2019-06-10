@@ -10,6 +10,7 @@ namespace Inventario.COMMON.Entidades
         public string Tipo { get; set; }
         public string Pedido { get; set; }
         public double Precio{ get; set; }
+        public double PrecioTotal { get; set; }
         public string Unidad { get; set; }
         public string Tamanio { get; set; }
 

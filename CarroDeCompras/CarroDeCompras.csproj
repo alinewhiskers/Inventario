@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Inventario.BIZ\Inventario.BIZ.csproj" />
+    <ProjectReference Include="..\Inventario.COMMON\Inventario.COMMON.csproj" />
+    <ProjectReference Include="..\Inventario.DAL\Inventario.DAL.csproj" />
+    <ProjectReference Include="..\Inventario.GUI.Administrador\Inventario.GUI.Administrador.csproj" />
+  </ItemGroup>
+
+</Project>

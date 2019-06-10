@@ -30,7 +30,7 @@ namespace Inventario.DAL
         public bool Crear(Articulo entidad)
         {
             entidad.Id = Guid.NewGuid().ToString();
-
+            entidad.PrecioTotal = entidad.Precio * 1.16;
             try
             {
                 using (var db=new LiteDatabase(DBName))
@@ -50,6 +50,7 @@ namespace Inventario.DAL
 
         public bool Editar(Articulo entidadModificada)
         {
+            entidadModificada.PrecioTotal = entidadModificada.Precio * 1.16;
             try
             {
                 using (var db = new LiteDatabase(DBName))

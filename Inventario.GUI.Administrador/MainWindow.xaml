@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Inventario.GUI.Administrador"
         mc:Ignorable="d"
-        Title="Sistema de Inventario" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="ToolWindow">
+        
+        Title="Sistema de Inventario" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="ToolWindow" MouseMove="BotonCarrito">
 
-    <Grid>
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="55*"/>
             <ColumnDefinition Width="738*"/>
@@ -17,35 +18,42 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <WrapPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,80" HorizontalAlignment="Center" Width="794">
+        <WrapPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,75" HorizontalAlignment="Center" Width="794">
             <WrapPanel.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FF2C6FD1" Offset="0"/>
                     <GradientStop Color="#FF2C3E57" Offset="1"/>
                 </LinearGradientBrush>
             </WrapPanel.Background>
+            <Label Foreground="White">Seleccione una acción:</Label>
             <Button x:Name="btnArticulosNuevo" Click="BtnArticulosNuevo_Click">Nuevo</Button>
             <Button x:Name="btnArticulosEditar" Click="BtnArticulosEditar_Click">Editar</Button>
             <Button x:Name="btnArticulosGuardar" Click="BtnArticulosGuardar_Click">Guardar</Button>
             <Button x:Name="btnArticulosCancelar" Click="BtnArticulosCancelar_Click">Cancelar</Button>
             <Button x:Name="btnArticulosEliminar" Click="BtnArticulosEliminar_Click">Eliminar</Button>
         </WrapPanel>
-        <WrapPanel Grid.ColumnSpan="2" Margin="0,0,0,38" Height="42" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock>Índice del artículo:</TextBlock>
-                <TextBlock x:Name="txbArticulosId" Width="100"></TextBlock>
+        <WrapPanel Grid.ColumnSpan="2" Margin="0,0,0,310" Height="81" VerticalAlignment="Bottom" Grid.RowSpan="2">
+            <WrapPanel.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFB8D2EC" Offset="0"/>
+                    <GradientStop Color="#FF8CAFD3" Offset="1"/>
+                </LinearGradientBrush>
+            </WrapPanel.Background>
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
+                <TextBlock >Índice del artículo:</TextBlock>
+                <TextBlock x:Name="txbArticulosId" Width="600"></TextBlock>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                 <TextBlock>Descripción:</TextBlock>
-                <TextBox x:Name="txbArticulosDescripcion" Width="200"/>
+                <TextBox x:Name="txbArticulosDescripcion" Width="200" Height="18"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                 <TextBlock>Tipo:</TextBlock>
-                <TextBox x:Name="txbArticulosTipo" Width="100"></TextBox>
+                <TextBox x:Name="txbArticulosTipo" Width="100" Height="19"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                 <TextBlock>Tamaño:</TextBlock>
-                <ComboBox x:Name="cbArticulosTamanio" Width="100" BorderBrush="#FFAEAEAE">
+                <ComboBox x:Name="cbArticulosTamanio" Width="100" BorderBrush="#FFAEAEAE" Height="19">
                     <ComboBox.Background>
                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                             <GradientStop Color="#FFF0F0F0" Offset="0"/>
@@ -54,25 +62,29 @@
                     </ComboBox.Background>
                 </ComboBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                 <TextBlock>Unidad de almacenamiento:</TextBlock>
                 <TextBox x:Name="txbArticulosUnidad" Width="100"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                 <TextBlock>Pedido:</TextBlock>
                 <TextBox x:Name="txbPedido" Width="100"></TextBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
                 <TextBlock>Precio Unitario:</TextBlock>
-                <TextBox x:Name="txbPrecioUnitario" Width="70"></TextBox>
+                <TextBox x:Name="txbPrecioUnitario" Width="70" KeyUp="CalculaPrecio"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock></TextBlock>
-                <TextBlock x:Name="txbPrecioTotal" Width="100"></TextBlock>
+            <StackPanel Margin="5,5,5,0" Orientation="Horizontal">
+                <TextBlock>Precio con IVA:</TextBlock>
+                <TextBlock x:Name="txbPrecioTotal" Width="103" Foreground="#FF070F57" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0"></TextBlock>
             </StackPanel>
 
         </WrapPanel>
-        <DataGrid x:Name="dtgArticulos" IsReadOnly="True" Grid.ColumnSpan="2" Margin="0,62,0,0" Grid.RowSpan="3"/>
+        <DataGrid x:Name="dtgArticulos" IsReadOnly="True" Grid.ColumnSpan="2" Margin="0,101,0,48" Grid.RowSpan="3" />
+        <StackPanel Orientation="Horizontal" Margin="434,273,10,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="295" Height="43">
+            <Button x:Name="btnArticulosVaciar" Width="120" Content="Vaciar carrito" Height="27" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15,8,0,8" Background="#FFF39B92" Click="BtnArticulosVaciar_Click"/>
+            <Button x:Name="btnArticulosComprar" Width="120" Content="Agregar a carrito" Height="27" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Background="#FFC2F17E" Click="BtnArticulosComprar_Click"/>
+        </StackPanel>
     </Grid>
 
 </Window>
